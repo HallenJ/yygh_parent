@@ -3,13 +3,16 @@ package com.atguigu.yygh.hosp.api;
 
 import com.atguigu.yygh.common.Result;
 import com.atguigu.yygh.common.handler.ZDYException;
+import com.atguigu.yygh.hosp.repository.ScheduleRepository;
 import com.atguigu.yygh.hosp.service.HospitalService;
 import com.atguigu.yygh.hosp.service.HospitalSetService;
+import com.atguigu.yygh.hosp.service.ScheduleService;
 import com.atguigu.yygh.hosp.service.impl.DepartmentServiceImpl;
 import com.atguigu.yygh.hosp.utils.HttpRequestHelper;
 import com.atguigu.yygh.hosp.utils.MD5;
 import com.atguigu.yygh.model.hosp.Department;
 import com.atguigu.yygh.model.hosp.Hospital;
+import com.atguigu.yygh.model.hosp.Schedule;
 import com.atguigu.yygh.vo.hosp.HospitalQueryVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,6 +38,8 @@ public class ApiController {
     private HospitalSetService hospitalSetService;
     @Autowired
     private DepartmentServiceImpl departmentService;
+    @Autowired
+    private ScheduleService scheduleService;
 
     @ApiOperation("接收医院信息")
     @PostMapping("saveHospital")
@@ -86,7 +91,7 @@ public class ApiController {
         Map<String, Object> paramMap = HttpRequestHelper.switchMap(parameterMap);
         //2.进行校验
         //调用下一层
-        departmentService.saveDepartment(parameterMap);
+        departmentService.saveDepartment(paramMap);
         //返回Result
         return Result.ok();
     }
@@ -106,14 +111,15 @@ public class ApiController {
         HospitalQueryVo hospitalQueryVo = new HospitalQueryVo();
         hospitalQueryVo.setHoscode((String) stringObjectMap.get("hoscode"));
 
-          Page<Department> page1 =departmentService.departmentList(limit, page, hospitalQueryVo);
+        Page<Department> page1 = departmentService.departmentList(limit, page, hospitalQueryVo);
 
         return Result.ok(page1);
 
     }
+
     @ApiOperation("部门删除")
     @PostMapping("department/remove")
-    public Result deleteDept(HttpServletRequest request){
+    public Result deleteDept(HttpServletRequest request) {
         Map<String, String[]> parameterMap = request.getParameterMap();
         Map<String, Object> stringObjectMap = HttpRequestHelper.switchMap(parameterMap);
         //进行校验
@@ -123,5 +129,42 @@ public class ApiController {
                 (String) stringObjectMap.get("depcode")
         );
         return Result.ok();
+    }
+
+    @ApiOperation("上传排班")
+    @PostMapping("saveSchedule")
+    public Result saveSchedule(HttpServletRequest request) {
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        Map<String, Object> stringObjectMap = HttpRequestHelper.switchMap(parameterMap);
+        //进行秘钥校验省略
+        scheduleService.save(stringObjectMap);
+        return Result.ok();
+    }
+
+    @ApiOperation("查询排班")
+    @PostMapping("schedule/list")
+    public Result scheduleList(HttpServletRequest request) {
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        Map<String, Object> stringObjectMap = HttpRequestHelper.switchMap(parameterMap);
+        String stringLimit = (String) stringObjectMap.get("limit");
+        String stringPage = (String) stringObjectMap.get("page");
+        int limit = StringUtils.isEmpty(stringLimit) ? 10 : Integer.parseInt(stringLimit);
+        int page = StringUtils.isEmpty(stringPage) ? 1 : Integer.parseInt(stringPage);
+        Schedule schedule = new Schedule();
+        schedule.setHoscode((String) stringObjectMap.get("hoscode"));
+        Page<Schedule> page1 = scheduleService.scheduleList(limit, page, schedule);
+        return Result.ok(page1);
+    }
+
+    @ApiOperation("删除排班")
+    @PostMapping("schedule/remove")
+    public Result scheduleRemove(HttpServletRequest request){
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        Map<String, Object> stringObjectMap = HttpRequestHelper.switchMap(parameterMap);
+        //省略校验
+        //调用下一层
+        scheduleService.scheduleRemove(stringObjectMap);
+        return Result.ok();
+
     }
 }
