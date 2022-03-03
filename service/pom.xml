@@ -14,6 +14,8 @@
     <modules>
         <module>service_hosp</module>
         <module>service_cmn</module>
+        <module>service-user</module>
+        <module>service-msm</module>
     </modules>
 
     <properties>
@@ -66,6 +68,10 @@
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
         </dependency>
     </dependencies>
 </project>

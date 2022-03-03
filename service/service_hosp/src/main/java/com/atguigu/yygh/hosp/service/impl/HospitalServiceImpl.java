@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -49,8 +50,7 @@ public class HospitalServiceImpl implements HospitalService {
 
     @Override
     public Hospital getHospByHoscode(String hoscode) {
-        Hospital byHoscode = hospitalRepository.getByHoscode(hoscode);
-        return byHoscode;
+        return hospitalRepository.getByHoscode(hoscode);
     }
 
     @Override
@@ -74,16 +74,14 @@ public class HospitalServiceImpl implements HospitalService {
         //3查询数据
         Page<Hospital> pageModel = hospitalRepository.findAll(example, pageable);
         //4 TODO 跨模块翻译字段
-        pageModel.getContent().stream().forEach(item->{
-            this.packHospital(item);
-        });
+        pageModel.getContent().forEach(this::packHospital);
 
         return pageModel;
     }
 
     @Override
     public void updateStatus(String id, Integer status) {
-        if(status.intValue() == 0 || status.intValue() == 1) {
+        if(status == 0 || status == 1) {
             Hospital hospital = hospitalRepository.findById(id).get();
             hospital.setStatus(status);
             hospital.setUpdateTime(new Date());
@@ -106,6 +104,22 @@ public class HospitalServiceImpl implements HospitalService {
         map.put("bookingRule",bookingRule);
         map.put("hospital",hospital1);
         return map;
+    }
+
+    @Override
+    public List<Hospital> getByHosnameLike(String hosname) {
+        return hospitalRepository.getHospitalByHosnameLike(hosname);
+    }
+
+    @Override
+    public Map<String, Object> findHospMapByHoscode(String hoscode) {
+        Hospital byHoscode = this.packHospital(hospitalRepository.getByHoscode(hoscode));
+        BookingRule bookingRule = byHoscode.getBookingRule();
+        byHoscode.setBookingRule("");
+        Map<String, Object> hashMap = new HashMap<>();
+        hashMap.put("bookingRule",bookingRule);
+            hashMap.put("list",byHoscode);
+        return hashMap;
     }
 
     private Hospital packHospital(Hospital hospital) {
