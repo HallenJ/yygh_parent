@@ -8,6 +8,7 @@ import com.atguigu.yygh.hosp.service.HospitalService;
 import com.atguigu.yygh.model.hosp.BookingRule;
 import com.atguigu.yygh.model.hosp.Hospital;
 import com.atguigu.yygh.vo.hosp.HospitalQueryVo;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
@@ -37,7 +38,7 @@ public class HospitalServiceImpl implements HospitalService {
             hospital.setUpdateTime(new Date());
             hospital.setId(hospital1.getId());
             hospital.setStatus(0);
-            Hospital save = hospitalRepository.save(hospital);
+            hospitalRepository.save(hospital);
         }else{
             //新增
             hospital.setIsDeleted(0);
@@ -122,6 +123,13 @@ public class HospitalServiceImpl implements HospitalService {
         return hashMap;
     }
 
+    @Override
+    public String getHospName(String hoscode) {
+        Hospital byHoscode = hospitalRepository.getByHoscode(hoscode);
+        String hosname = byHoscode.getHosname();
+        return hosname;
+    }
+
     private Hospital packHospital(Hospital hospital) {
         //翻译省市区
         String provinceCode = hospital.getProvinceCode();
@@ -134,6 +142,4 @@ public class HospitalServiceImpl implements HospitalService {
         hospital.getParam().put("fullAddress", provinceString + cityString + districtString + hospital.getAddress());
         return hospital;
     }
-
-
 }

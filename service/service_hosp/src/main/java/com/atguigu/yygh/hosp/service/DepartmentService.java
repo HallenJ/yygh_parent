@@ -17,4 +17,8 @@ public interface DepartmentService {
     void deleteDept(String hoscode, String depcode);
     //实现所有部门树形查询
     List<DepartmentVo> getDeptList(String hoscode);
+
+    Department getDepartment(String hoscode, String depcode);
+
+    String getDepartmentName(String hoscode, String depcode);
 }

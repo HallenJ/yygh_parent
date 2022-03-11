@@ -79,7 +79,6 @@ public class DepartmentServiceImpl implements DepartmentService {
                 .collect(Collectors.groupingBy(Department::getBigcode));
         for (Map.Entry<String, List<Department>> listEntry : collect.entrySet()) {
             //创建一个对象去接收bigDep
-            System.out.println("listEntry = " + listEntry);
             DepartmentVo departmentVo = new DepartmentVo();
             departmentVo.setDepname(listEntry.getValue().get(0).getBigname());
             departmentVo.setDepcode(listEntry.getKey());
@@ -97,5 +96,18 @@ public class DepartmentServiceImpl implements DepartmentService {
             depList.add(departmentVo);
         }
         return depList;
+    }
+
+    @Override
+    public Department getDepartment(String hoscode, String depcode) {
+        Department byHoscodeAndDepcode = departmentRepository.getByHoscodeAndDepcode(hoscode, depcode);
+        return byHoscodeAndDepcode;
+    }
+
+    @Override
+    public String getDepartmentName(String hoscode, String depcode) {
+        Department byHoscodeAndDepcode = departmentRepository.getByHoscodeAndDepcode(hoscode, depcode);
+        String depname = byHoscodeAndDepcode.getDepname();
+        return depname;
     }
 }
